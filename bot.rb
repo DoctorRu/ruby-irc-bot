@@ -1,32 +1,54 @@
-require  'socket'
+# Usar multhread ?
+# to do: logger
 
-puts 'connecting...'
-#socket = TCPSocket.new('chat.freenode.net', 8001)
-socket = TCPSocket.new('irc.freenode.net', 6667)
+module IrcBot
 
-socket.puts 'NICK oblivion3'
-socket.puts 'USER oblivion3 0 * oblivion'
-socket.puts 'JOIN #programmiersprache'
+    require 'socket'
+    require 'colorize'
+    require 'yaml'
+    require 'awesome_print'
 
-running = true
+    class Bot
 
-puts 'connected!'
+        workers = YAML::load_file('bot.yml')
+        ap workers
 
-until socket.eof? do
-    puts socket.gets
+        def initialize(server, port, channels, nick)
+            @server = server
+            @port = port
+            @channels = channels
+            @nick = nick
+        end
+        
+        def connect
+            puts "connecting to server #{@server}:#{@port}...".yellow
+            
+            @socket = TCPSocket.new(@server, @port)
+            puts "connected!".green
+          
+            @channels.each do |channel|
+               send("NICK #{@nick}")
+               send("USER #{@nick} 0 * #{@nick}")
+               send("JOIN ##{channel}")
+
+            end
+
+            until @socket.eof? do
+                puts @socket.gets
+            end
+        end
+
+
+        def send(msg)
+            puts msg.blue
+            @socket.puts msg
+        end
+
+    end
 end
 
+channels = ['programmiersprache']
 
-#while(running) do
-#    ready = IO.select([socket])
-#
-#    ready[0].each do |s|
-#        line = s.gets
-#        puts s.gets
-#    end
-#
-#end
-#
-puts 'Exited :('
-
+bot = IrcBot::Bot.new('irc.freenode.net', 6667, channels, 'AirBoat')
+#bot.connect
 

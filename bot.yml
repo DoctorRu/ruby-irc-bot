@@ -1,0 +1,15 @@
+bots:
+    - bot :
+        name : AirBoat
+        password: anypass
+        channels:
+            - programmiersprache
+            - elixir-br
+        
+    - bot :
+        name : PixelDrone
+        password: otherpass
+        channels:
+            - programmiersprache
+            - elixir-br
+ 
